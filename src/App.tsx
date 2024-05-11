@@ -1,26 +1,64 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import axios from "axios";
+import { useEffect, useState } from "react";
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+
+interface AppType {
+  _id : number
+  name: "string"
 }
+
+const App = () => {
+
+  const [isLoading, setIsLoading] = useState(true)
+  const [data, setData] = useState<AppType[]>([])
+  const [value, setValue]  = useState('')
+  const getData = async () => {
+    try {
+      const {data} =  await axios.get(
+        "https://api-v2.elchocrud.pro/api/v1/fb8fa51539bca7a87cc74b13fdeca82a/product"
+      );
+
+      setData(data)
+      console.log(data);
+    } catch (error) {
+      console.log(error);
+    }finally{
+      setIsLoading(false)
+    }
+
+ 
+  };
+
+  const postData = async() => {
+    try {
+      const {data} = await axios.post("https://api-v2.elchocrud.pro/api/v1/fb8fa51539bca7a87cc74b13fdeca82a/product", {name : value})
+      console.log(data);
+      getData()
+    } catch (error) {
+      console.log(error);
+    }
+  }
+  useEffect(()=> {
+    getData()
+   }, [])
+  return <div>{
+    isLoading ? (
+      <h1>Loading</h1>
+    ): (
+     <div>
+      {
+        data.map((el)=> (
+          <h1 key={el._id}>{el.name}</h1>
+        ))
+      }
+
+      <div>
+        <input type="text" value={value}  onChange={(e)=> setValue(e.target.value)}/>
+        <button onClick={()=> postData()}>click</button>
+      </div>
+     </div>
+    )
+    }</div>;
+};
 
 export default App;
